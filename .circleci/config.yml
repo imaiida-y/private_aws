@@ -2,7 +2,7 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: buildpack-deps:trusty
+      - image: circleci/buildpack-deps:20.10-curl
     working_directory: ~/workspace
 
 commands:
