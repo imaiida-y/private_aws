@@ -2,11 +2,13 @@
 ## Structure
 ```
 private_aws
+├── .circleci
+|   └── config.yml
 ├── README.md
 ├── terrafrom
 |   ├── main.tf
 |   └── variable.tf
-├── cloudformation
+└── cloudformation
 ```
 
 ## environment
