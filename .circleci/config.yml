@@ -1,0 +1,235 @@
+version: 2.1
+executors:
+  default:
+    working_directory: ~/workspace
+
+commands:
+  install_terraform: 
+    steps:
+      - run:
+          name: 'install terraform'
+          command: |
+            cd /tmp
+            curl https://releases.hashicorp.com/terraform/0.13.0/terraform_0.13.0_linux_amd64.zip -o terraform.zip
+            unzip terraform.zip
+            sudo mv terraform /usr/local/bin
+            rm -f terraform.zip
+jobs:
+  terraform_plan:
+    parameters:
+      provider:
+        type: enum
+        enum: ["terraform"]
+      dir_env:
+        type: enum
+        enum: ["staging", "production"]
+      param_env:
+        type: enum
+        enum: ["STG", "PRD"]
+    executor:
+      name: default
+    steps:
+      - checkout
+      - install_terraform
+      - run:
+          name: 'terraform plan'
+          command: |
+            # # tfstateをs3で管理するために利用する認証情報
+            # export AWS_ACCESS_KEY_ID=${<< parameters.param_env >>_AWS_ACCESS_KEY_ID}
+            # export AWS_SECRET_ACCESS_KEY=${<< parameters.param_env >>_AWS_SECRET_ACCESS_KEY}
+            terraform fmt -check=true -diff=true
+            terraform init
+            terraform plan
+
+  terraform_apply:
+    parameters:
+      provider:
+        type: enum
+        enum: ["terraform"]
+      dir_env:
+        type: enum
+        enum: ["staging", "production"]
+      param_env:
+        type: enum
+        enum: ["STG", "PRD"]
+    executor:
+      name: default
+    steps:
+      - checkout
+      - install_terraform
+      - run:
+          name: "terraform apply"
+          command: |
+            # # tfstateをs3で管理するために利用する認証情報
+            # export AWS_ACCESS_KEY_ID=${<< parameters.param_env >>_AWS_ACCESS_KEY_ID}
+            # export AWS_SECRET_ACCESS_KEY=${<< parameters.param_env >>_AWS_SECRET_ACCESS_KEY}
+            terraform init
+            terraform plan
+
+workflows:
+  plan_and_deploy:
+    jobs:
+      # #fastly_stg
+      # - terraform_plan:
+      #     name: terraform_plan_fastly_stg
+      #     provider: fastly
+      #     dir_env: staging
+      #     param_env: STG
+      #     filters:
+      #       branches:
+      #         only: main
+      # - hold:
+      #     name: approval_terraform_apply_fastly_stg
+      #     type: approval
+      #     requires:
+      #       - terraform_plan_fastly_stg
+      #     filters:
+      #       branches:
+      #         only: main
+      # - slack/approval-notification:
+      #     message: ':mega: [ Approve Required ] Job: terraform_plan_fastly_stg \nPlease check the plan from below.'
+      #     url: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+      #     channel: ${SLACK_CHANNEL_ID}
+      #     webhook: ${SLACK_WEBHOOK}
+      #     requires:
+      #       - terraform_plan_fastly_stg
+      #     filters:
+      #       branches:
+      #         only: main
+      # - terraform_apply:
+      #     name: terraform_apply_fastly_stg
+      #     provider: fastly
+      #     dir_env: staging
+      #     param_env: STG
+      #     requires:
+      #       - approval_terraform_apply_fastly_stg
+      #     filters:
+      #       branches:
+      #         only: main
+      # #fastly_prd
+      # - terraform_plan:
+      #     name: terraform_plan_fastly_prd
+      #     provider: fastly
+      #     dir_env: production
+      #     param_env: PRD
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/ #[NOTE]マージ＆PRに反応しないようにする
+      # - hold:
+      #     name: approval_terraform_apply_fastly_prd
+      #     type: approval
+      #     requires:
+      #       - terraform_plan_fastly_prd
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/
+      # - slack/approval-notification:
+      #     message: ':mega: [ Approve Required ] Job: terraform_plan_fastly_prd \nPlease check the plan from below.'
+      #     url: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+      #     channel: ${SLACK_CHANNEL_ID}
+      #     webhook: ${SLACK_WEBHOOK}
+      #     requires:
+      #       - terraform_plan_fastly_prd
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/
+      # - terraform_apply:
+      #     name: terraform_apply_fastly_prd
+      #     provider: fastly
+      #     dir_env: production
+      #     param_env: PRD
+      #     requires:
+      #       - approval_terraform_apply_fastly_prd
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/
+      # #datadog_stg
+      # - terraform_plan:
+      #     name: terraform_plan_datadog_stg
+      #     provider: datadog
+      #     dir_env: staging
+      #     param_env: STG
+      #     filters:
+      #       branches:
+      #         only: main
+      # - hold:
+      #     name: approval_terraform_apply_datadog_stg
+      #     type: approval
+      #     requires:
+      #       - terraform_plan_datadog_stg
+      #     filters:
+      #       branches:
+      #         only: main
+      # - slack/approval-notification:
+      #     message: ':mega: [ Approve Required ] Job: terraform_plan_datadog_stg \nPlease check the plan from below.'
+      #     url: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+      #     channel: ${SLACK_CHANNEL_ID}
+      #     webhook: ${SLACK_WEBHOOK}
+      #     requires:
+      #       - terraform_plan_datadog_stg
+      #     filters:
+      #       branches:
+      #         only: main
+      # - terraform_apply:
+      #     name: terraform_apply_datadog_stg
+      #     provider: datadog
+      #     dir_env: staging
+      #     param_env: STG
+      #     requires:
+      #       - approval_terraform_apply_datadog_stg
+      #     filters:
+      #       branches:
+      #         only: main
+      # #datadog_prd
+      # - terraform_plan:
+      #     name: terraform_plan_datadog_prd
+      #     provider: datadog
+      #     dir_env: production
+      #     param_env: PRD
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/ #[NOTE]マージ＆PRに反応しないようにする
+      # - hold:
+      #     name: approval_terraform_apply_datadog_prd
+      #     type: approval
+      #     requires:
+      #       - terraform_plan_datadog_prd
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/
+      # - slack/approval-notification:
+      #     message: ':mega: [ Approve Required ] Job: terraform_plan_datadog_prd \nPlease check the plan from below.'
+      #     url: https://circleci.com/workflow-run/${CIRCLE_WORKFLOW_ID}
+      #     channel: ${SLACK_CHANNEL_ID}
+      #     webhook: ${SLACK_WEBHOOK}
+      #     requires:
+      #       - terraform_plan_datadog_prd
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/
+      # - terraform_apply:
+      #     name: terraform_apply_datadog_prd
+      #     provider: datadog
+      #     dir_env: production
+      #     param_env: PRD
+      #     requires:
+      #       - approval_terraform_apply_datadog_prd
+      #     filters:
+      #       tags:
+      #         only: /^v[0-9]+(\.[0-9]+){2}$/
+      #       branches:
+      #         ignore: /.*/
