@@ -9,6 +9,7 @@ private_aws
 |   ├── main.tf
 |   └── variable.tf
 └── cloudformation
+    └── cfn.yml
 ```
 
 ## environment
