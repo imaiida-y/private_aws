@@ -40,7 +40,7 @@ jobs:
             # export AWS_ACCESS_KEY_ID=${<< parameters.param_env >>_AWS_ACCESS_KEY_ID}
             # export AWS_SECRET_ACCESS_KEY=${<< parameters.param_env >>_AWS_SECRET_ACCESS_KEY}
             terraform fmt -check=true -diff=true
-            terraform init
+            terraform init ./terraform/
             terraform plan
 
   terraform_apply:
@@ -65,7 +65,7 @@ jobs:
             # # tfstateをs3で管理するために利用する認証情報
             # export AWS_ACCESS_KEY_ID=${<< parameters.param_env >>_AWS_ACCESS_KEY_ID}
             # export AWS_SECRET_ACCESS_KEY=${<< parameters.param_env >>_AWS_SECRET_ACCESS_KEY}
-            terraform init
+            terraform init ./terraform/
             terraform plan
 
 workflows:
