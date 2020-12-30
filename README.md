@@ -3,13 +3,18 @@
 ```
 private_aws
 ├── .circleci
-|   └── config.yml
+❘     └── config.yml
 ├── README.md
 ├── terrafrom
-|   ├── main.tf
-|   └── variable.tf
-└── cloudformation
-    └── cfn.yml
+❘     ├── main.tf
+❘     └── variable.tf
+├── cloudformation
+❘       └── cfn.yml
+❘
+├── cloudformation
+❘
+❘
+└── ansible
 ```
 
 ## environment
