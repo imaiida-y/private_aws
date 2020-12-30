@@ -3,17 +3,17 @@
 ```
 private_aws
 ├── .circleci
-❘     └── config.yml
+│      └── config.yml
 ├── README.md
 ├── terrafrom
-❘     ├── main.tf
-❘     └── variable.tf
+│      ├── main.tf
+│      └── variable.tf
 ├── cloudformation
-❘       └── cfn.yml
-❘
+│        └── cfn.yml
+│ 
 ├── cloudformation
-❘
-❘
+│ 
+│ 
 └── ansible
 ```
 
