@@ -1,11 +1,11 @@
-resource "aws_instance" "hello-world" {
-
-  ami = "ami-0a313d6098716f372" 
-  instance_type = "t2.micro"
-# vpc_security_group_ids = ["${aws_security_group.webserver_sg.id}"]
-  key_name = "aws-imaiida-key-east1"
+resource "aws_instance" "MyWebserver" {
+  count                  = 3
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  vpc_security_group_ids = ["${aws_security_group.webserver_sg.id}"]
   tags = {
-	 Name = "Hello world"
+    Name = "My-Webserver-${count.index}"
   }
+  key_name = var.key-store-name
 
 }
