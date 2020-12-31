@@ -7,7 +7,9 @@ private_aws
 ├── README.md
 ├── terrafrom
 │      ├── main.tf
-│      └── variable.tf
+│      ├── provider.tf
+│      ├── security-group.tf
+│      └── variables.tf
 ├── cloudformation
 │        └── cfn.yml
 │ 
