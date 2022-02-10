@@ -74,6 +74,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+    - name: Access Key
+      run: echo ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
     - name: Terraform Derectory Change
       run: cd terraform/
 
