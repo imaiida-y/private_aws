@@ -82,23 +82,28 @@ jobs:
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       working-directory: ./terraform
+      id: fmt
       run: terraform fmt -diff=true -check=true
 
-    - name: PR Comment
-      uses: actions/github-script@v3.0.0
+    - name: Post Format to GitHub PR
+      uses: actions/github-script@v1
+      if: ${{ !contains(steps.fmt.outputs.stdout, 'No changes.') }}
       env:
-        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        STDOUT: "${{ steps.plan.outputs.stdout }}"
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        # NOTE: 区切り文字で囲まれた範囲のみを出力する
         script: |
-          const output = `
-          #### Terraform Plan: \`${{ steps.plan.outcome }}\`
-
-          <details><summary>Show Plan</summary>
-
-          \`\`\`${process.env.PLAN}\`\`\`
-
-          </details>`;
+          const lines = process.env.STDOUT.split('\n')
+          const separator = '-'.repeat(72)
+          let index = lines.indexOf(separator)
+          let outputLines = lines.slice(index + 1)
+          index = outputLines.indexOf(separator)
+          if (index) {
+            outputLines = outputLines.slice(0, index)
+          }
+          const planOutput = '```' + outputLines.join('\n') + '```'
+          const output = `<details><summary>tf plan:</summary>\n\n${planOutput}\n\n</details>`;
 
           github.issues.createComment({
             issue_number: context.issue.number,
@@ -118,7 +123,7 @@ jobs:
       working-directory: ./terraform/
       run: terraform plan -no-color -lock=false
 
-    - name: PR Comment
+    - name: Post Plan to GitHub PR
       uses: actions/github-script@v1
       if: ${{ !contains(steps.plan.outputs.stdout, 'No changes.') }}
       env:
