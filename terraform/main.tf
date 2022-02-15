@@ -4,7 +4,7 @@ terraform {
     bucket = "aws-imaiida-terraform-state"
     region = "us-east-1"
     key = "terraform.tfstate"
-#    encrypt = true
+    #    encrypt = true
   }
 }
 
