@@ -89,7 +89,7 @@ jobs:
       uses: actions/github-script@v1
       if: ${{ !contains(steps.fmt.outputs.stdout, 'No changes.') }}
       env:
-        STDOUT: "${{ steps.plan.outputs.stdout }}"
+        STDOUT: "${{ steps.fmt.outputs.stdout }}"
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         # NOTE: 区切り文字で囲まれた範囲のみを出力する
@@ -102,8 +102,8 @@ jobs:
           if (index) {
             outputLines = outputLines.slice(0, index)
           }
-          const planOutput = '```' + outputLines.join('\n') + '```'
-          const output = `<details><summary>tf plan:</summary>\n\n${planOutput}\n\n</details>`;
+          const fmtOutput = '```' + outputLines.join('\n') + '```'
+          const output = `<details><summary>terraform fmt:</summary>\n\n${fmtOutput}\n\n</details>`;
 
           github.issues.createComment({
             issue_number: context.issue.number,
@@ -141,7 +141,7 @@ jobs:
             outputLines = outputLines.slice(0, index)
           }
           const planOutput = '```' + outputLines.join('\n') + '```'
-          const output = `<details><summary>tf plan:</summary>\n\n${planOutput}\n\n</details>`;
+          const output = `<details><summary>terraform plan:</summary>\n\n${planOutput}\n\n</details>`;
 
           github.issues.createComment({
             issue_number: context.issue.number,
