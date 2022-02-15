@@ -82,14 +82,7 @@ jobs:
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       working-directory: ./terraform
-#      run: terraform fmt -diff=true -check=true
-      action "terraform-fmt" {
-        uses = "hashicorp/terraform-github-actions/fmt@v0.1.1"
-        secrets = ["GITHUB_TOKEN"]
-        env = {
-          TF_ACTION_WORKING_DIR = "."
-        }
-      }
+      run: terraform fmt -diff=true -check=true
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -101,28 +94,41 @@ jobs:
       working-directory: ./terraform/
       run: terraform plan 
 
-    - name: PR Comment
-      uses: actions/github-script@v3.0.0
-      env:
-        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    # Post Plan to PR Comment
+    - name: Post Plan to GitHub PR
+      uses: mshick/add-pr-comment@v1
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const output = `
-          #### Terraform Plan: \`${{ steps.plan.outcome }}\`
+        allow-repeats: true
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          ## ${{ matrix.path }} plan
+          ```
+          ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+          ```
 
-          <details><summary>Show Plan</summary>
+    # - name: PR Comment
+    #   uses: actions/github-script@v3.0.0
+    #   env:
+    #     PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    #   with:
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     script: |
+    #       const output = `
+    #       #### Terraform Plan: \`${{ steps.plan.outcome }}\`
 
-          \`\`\`${process.env.PLAN}\`\`\`
+    #       <details><summary>Show Plan</summary>
 
-          </details>`;
+    #       \`\`\`${process.env.PLAN}\`\`\`
 
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })
+    #       </details>`;
+
+    #       github.issues.createComment({
+    #         issue_number: context.issue.number,
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         body: output
+    #       })
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
