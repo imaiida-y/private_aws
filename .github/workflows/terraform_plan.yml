@@ -85,7 +85,7 @@ jobs:
       run: terraform init
 
     # Checks that all Terraform configuration files adhere to a canonical format
-    # - name: Terraform Format
+    - name: Terraform Format
       working-directory: ./terraform
       run: terraform fmt -recursive -check
 
