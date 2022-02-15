@@ -11,7 +11,7 @@ variable "ssh_port" {
   default = "22"
 }
 variable "instance_type" {
-  default = "t2.micro"
+  default = "t3.micro"
 }
 variable "my_public_ip" {
   default = "98.207.180.245/32"
