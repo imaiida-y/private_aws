@@ -1,11 +1,11 @@
 terraform {
   required_version = ">= 1.1.4"
-  backend "s3" {
-    bucket = "aws-imaiida-terraform-state"
-    region = "us-east-1"
-    key = "terraform.tfstate"
-#    encrypt = true
-  }
+#   backend "s3" {
+#     bucket = "aws-imaiida-terraform-state"
+#     region = "us-east-1"
+#     key = "terraform.tfstate"
+# #    encrypt = true
+#   }
 }
 
 resource "aws_s3_bucket" "terraform_state" {
