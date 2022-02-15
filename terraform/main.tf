@@ -3,8 +3,8 @@ terraform {
   backend "s3" {
     bucket = "aws-imaiida-terraform-state"
     region = "us-east-1"
-    key = "terraform.tfstate"
-#    encrypt = true
+    key    = "terraform.tfstate"
+    #    encrypt = true
   }
 }
 
