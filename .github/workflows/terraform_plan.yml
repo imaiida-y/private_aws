@@ -125,7 +125,7 @@ jobs:
 
     - name: Post Plan to GitHub PR
       uses: actions/github-script@v1
-      if: ${{ !contains(steps.plan.outputs.stdout && github.ref != 'refs/heads/main', 'No changes.') }}
+      if: ${{ !contains(steps.plan.outputs.stdout || github.ref != 'refs/heads/main', 'No changes.') }}
       env:
         STDOUT: "${{ steps.plan.outputs.stdout }}"
       with:
