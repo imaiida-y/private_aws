@@ -6,12 +6,12 @@ resource "aws_security_group" "webserver_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.my_public_ip]
   }
-  ingress {
-    from_port   = var.ssh_port
-    to_port     = var.ssh_port
-    protocol    = "tcp"
-    cidr_blocks = [var.my_public_ip]
-  }
+  # ingress {
+  #   from_port   = var.ssh_port
+  #   to_port     = var.ssh_port
+  #   protocol    = "tcp"
+  #   cidr_blocks = [var.my_public_ip]
+  # }
   egress {
     from_port   = 0
     to_port     = 0
